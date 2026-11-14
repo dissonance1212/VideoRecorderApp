@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/ivStopButton"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/overlay_stop_bg"
+        android:src="@android:drawable/ic_media_pause"
+        android:contentDescription="Stop Recording"
+        android:scaleType="centerInside"
+        android:padding="12dp" />
+
+</FrameLayout>

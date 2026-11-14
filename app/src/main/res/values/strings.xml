@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Max Quality Screen Recorder</string>
+    <string name="start_recording">Начать запись экрана</string>
+    <string name="stop_recording">Остановить запись</string>
+    <string name="permission_microphone">Разрешение на микрофон необходимо для записи звука</string>
+    <string name="permission_storage">Разрешение на хранилище необходимо для сохранения видео</string>
+    <string name="permission_overlay">Разрешение на отображение поверх других приложений необходимо для кнопки остановки</string>
+    <string name="permission_screen_capture">Разрешение на захват экрана необходимо для записи</string>
+    <string name="recording_started">Запись экрана начата. Нажмите кнопку на экране для остановки.</string>
+    <string name="recording_stopped">Запись остановлена. Видео сохранено.</string>
+    <string name="error_recording">Ошибка при записи экрана</string>
+    <string name="settings">Настройки</string>
+    <string name="resolution_label">Разрешение:</string>
+    <string name="fps_label">FPS:</string>
+    <string name="bitrate_label">Битрейт (Mbps):</string>
+    <string name="max_quality">Максимальное качество</string>
+    <string name="record_audio">Записывать звук с микрофона</string>
+    <string name="record_system_audio">Записывать системный звук</string>
+    <string name="show_touches">Показывать касания</string>
+</resources>
