@@ -10,15 +10,12 @@ import android.media.MediaRecorder
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -128,12 +125,16 @@ class ScreenRecordService : LifecycleService() {
 
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             
-            val videoEncoder = if (MediaRecorder.getVideoEncoderCapability(MediaRecorder.VideoEncoder.HEVC, screenWidth, screenHeight).isSupported) {
-                MediaRecorder.VideoEncoder.HEVC
+            val videoEncoder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                try {
+                    MediaRecorder.getVideoEncoderCapability(MediaRecorder.VideoEncoder.HEVC, screenWidth, screenHeight).isSupported
+                } catch (e: Exception) {
+                    false
+                }
             } else {
-                MediaRecorder.VideoEncoder.H264
+                false
             }
-            setVideoEncoder(videoEncoder)
+            setVideoEncoder(if (videoEncoder) MediaRecorder.VideoEncoder.HEVC else MediaRecorder.VideoEncoder.H264)
             
             if (recordAudio) {
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
