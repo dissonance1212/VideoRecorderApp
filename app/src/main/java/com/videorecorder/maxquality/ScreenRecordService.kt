@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,7 +26,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ScreenRecordService : LifecycleService() {
+class ScreenRecordService : Service() {
 
     private val TAG = "ScreenRecordService"
     private val scope = CoroutineScope(Dispatchers.IO + Job())
@@ -50,13 +49,13 @@ class ScreenRecordService : LifecycleService() {
     companion object {
         const val ACTION_START = "ACTION_START_RECORDING"
         const val ACTION_STOP = "ACTION_STOP_RECORDING"
-        const val EXTRA_MEDIA_PROJECTION = "EXTRA_MEDIA_PROJECTION"
         const val EXTRA_RESULT_CODE = "EXTRA_RESULT_CODE"
         const val EXTRA_RECORD_AUDIO = "EXTRA_RECORD_AUDIO"
         const val EXTRA_RECORD_SYSTEM_AUDIO = "EXTRA_RECORD_SYSTEM_AUDIO"
         const val EXTRA_SHOW_TOUCHES = "EXTRA_SHOW_TOUCHES"
         const val NOTIFICATION_ID = 1001
         const val CHANNEL_ID = "screen_record_channel"
+        var mediaProjectionInstance: MediaProjection? = null
     }
 
     override fun onCreate() {
@@ -75,7 +74,7 @@ class ScreenRecordService : LifecycleService() {
         intent?.let {
             when (it.action) {
                 ACTION_START -> {
-                    val projection = it.getParcelableExtra<MediaProjection>(EXTRA_MEDIA_PROJECTION)
+                    val projection = mediaProjectionInstance
                     val resultCode = it.getIntExtra(EXTRA_RESULT_CODE, 0)
                     recordAudio = it.getBooleanExtra(EXTRA_RECORD_AUDIO, true)
                     recordSystemAudio = it.getBooleanExtra(EXTRA_RECORD_SYSTEM_AUDIO, true)

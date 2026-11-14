@@ -11,7 +11,6 @@ import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Log
@@ -185,7 +184,8 @@ class MainActivity : AppCompatActivity() {
             REQUEST_CODE_SCREEN_CAPTURE -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     val projection = mediaProjectionManager.getMediaProjection(resultCode, data)
-                    startRecordingService(projection, resultCode)
+                    ScreenRecordService.mediaProjectionInstance = projection
+                    startRecordingService(resultCode)
                 } else {
                     Toast.makeText(this, "Разрешение на захват экрана отклонено", Toast.LENGTH_SHORT).show()
                 }
@@ -209,10 +209,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startRecordingService(projection: android.media.projection.MediaProjection, resultCode: Int) {
+    private fun startRecordingService(resultCode: Int) {
         val intent = Intent(this, ScreenRecordService::class.java).apply {
             action = ScreenRecordService.ACTION_START
-            putExtra(ScreenRecordService.EXTRA_MEDIA_PROJECTION, projection)
             putExtra(ScreenRecordService.EXTRA_RESULT_CODE, resultCode)
             putExtra(ScreenRecordService.EXTRA_RECORD_AUDIO, cbRecordAudio.isChecked)
             putExtra(ScreenRecordService.EXTRA_RECORD_SYSTEM_AUDIO, cbRecordSystemAudio.isChecked)
