@@ -284,7 +284,7 @@ class ScreenRecordService : Service() {
         if (isRecording.get()) {
             stopRecording()
         }
-        scope.cancel()
+        scope.coroutineContext.cancel()
         super.onDestroy()
     }
 
