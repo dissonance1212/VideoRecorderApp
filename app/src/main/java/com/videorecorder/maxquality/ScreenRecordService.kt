@@ -124,17 +124,8 @@ class ScreenRecordService : Service() {
 
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             
-            // Use HEVC if available (API 28+), fallback to H264
-            val useHevc = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                try {
-                    MediaRecorder.getVideoEncoderCapability(MediaRecorder.VideoEncoder.HEVC, screenWidth, screenHeight).isSupported
-                } catch (e: Exception) {
-                    false
-                }
-            } else {
-                false
-            }
-            setVideoEncoder(if (useHevc) MediaRecorder.VideoEncoder.HEVC else MediaRecorder.VideoEncoder.H264)
+            // Use H264 for compatibility
+            setVideoEncoder(MediaRecorder.VideoEncoder.H264)
             
             if (recordAudio) {
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
@@ -284,7 +275,6 @@ class ScreenRecordService : Service() {
         if (isRecording.get()) {
             stopRecording()
         }
-        scope.coroutineContext.cancel()
         super.onDestroy()
     }
 
