@@ -2,8 +2,10 @@ package com.videorecorder.maxquality
 
 import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -17,7 +19,6 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -48,6 +49,9 @@ class MainActivity : AppCompatActivity() {
     private var screenHeight = 1080
     private var screenDensity = 1f
 
+    private var startedReceiver: BroadcastReceiver? = null
+    private var stoppedReceiver: BroadcastReceiver? = null
+
     companion object {
         const val ACTION_RECORDING_STARTED = "ACTION_RECORDING_STARTED"
         const val ACTION_RECORDING_STOPPED = "ACTION_RECORDING_STOPPED"
@@ -63,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         detectScreenSpecs()
         checkAllPermissions()
         setupClickListeners()
-        observeRecordingState()
+        setupBroadcastReceivers()
     }
 
     private fun initViews() {
@@ -224,31 +228,33 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
     }
 
-    private fun observeRecordingState() {
-        lifecycleScope.launch {
-            val startedReceiver = registerReceiver(object : androidx.content.BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    isRecording = true
-                    btnRecord.isSelected = true
-                    tvStatus.text = "● ЗАПИСЬ ИДЁТ\nНажмите кнопку на экране для остановки"
-                    Toast.makeText(this@MainActivity, "Запись начата", Toast.LENGTH_SHORT).show()
-                }
-            }, androidx.core.content.ContextCompat.getMainExecutor(this), IntentFilter(ACTION_RECORDING_STARTED))
-
-            val stoppedReceiver = registerReceiver(object : androidx.content.BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    isRecording = false
-                    btnRecord.isSelected = false
-                    tvStatus.text = "Готов к записи экрана\nМакс. качество • 120 FPS"
-                    val path = intent.getStringExtra("path")
-                    Toast.makeText(this@MainActivity, "Видео сохранено: $path", Toast.LENGTH_LONG).show()
-                }
-            }, androidx.core.content.ContextCompat.getMainExecutor(this), IntentFilter(ACTION_RECORDING_STOPPED))
+    private fun setupBroadcastReceivers() {
+        startedReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                isRecording = true
+                btnRecord.isSelected = true
+                tvStatus.text = "● ЗАПИСЬ ИДЁТ\nНажмите кнопку на экране для остановки"
+                Toast.makeText(this@MainActivity, "Запись начата", Toast.LENGTH_SHORT).show()
+            }
         }
+        registerReceiver(startedReceiver!!, IntentFilter(ACTION_RECORDING_STARTED))
+
+        stoppedReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                isRecording = false
+                btnRecord.isSelected = false
+                tvStatus.text = "Готов к записи экрана\nМакс. качество • 120 FPS"
+                val path = intent.getStringExtra("path")
+                Toast.makeText(this@MainActivity, "Видео сохранено: $path", Toast.LENGTH_LONG).show()
+            }
+        }
+        registerReceiver(stoppedReceiver!!, IntentFilter(ACTION_RECORDING_STOPPED))
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        startedReceiver?.let { unregisterReceiver(it) }
+        stoppedReceiver?.let { unregisterReceiver(it) }
         if (isRecording) {
             stopRecording()
         }
