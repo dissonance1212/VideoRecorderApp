@@ -20,6 +20,11 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: 8.4
+
     - name: Configure Android SDK
       run: |
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
@@ -34,10 +39,6 @@ jobs:
     - name: Install required packages
       run: |
         /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
-
-    - name: Setup Gradle Wrapper
-      run: |
-        gradle wrapper --gradle-version 8.4
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
